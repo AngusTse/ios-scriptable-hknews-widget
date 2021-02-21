@@ -1,18 +1,15 @@
-var dataDir = "hk01-widget-news-data";
 // Variables used by Scriptable.
 // These must be at the very top of the file. Do not edit.
 // icon-color: blue; icon-glyph: file-alt;
-/* SCRIPTABLE NEWS WIDGET (WORDPRESS OR RSS)
- v1.0.2 coded by Saudumm (https://twitter.com/saudumm)
- GitHub: https://github.com/Saudumm/scriptable-News-Widget
+/* SCRIPTABLE Hong Kong NEWS WIDGET
+ v0.0.1 coded by Angus (https://twitter.com/angus_t)
+ 
+ This project used to provide Hong Kong news widget with Scriptable.
+ This project inspired from Saudumm (https://github.com/Saudumm/scriptable-News-Widget).  
  
  WIDGET PARAMETERS: you can long press on the widget on your homescreen and edit parameters
- - example: small|https://www.stadt-bremerhaven.de|Caschys Blog|true|background.jpg|false|true
- - parameter order has to be: widget size, site url, site name, show post images, background image, blur background image, background image gradient
- - parameters have to be separated by |
- - You can omit parameters, for example background image: small|https://www.stadt-bremerhaven.de|Caschys Blog
- - you can just set "small", "medium" or "large" as a parameter
- - parameters that are not set will be set by the standard widget config
+ - example:  APPLEDAILY:
+ 
  
  STANDARD WIDGET CONFIG: standard config below can be overwritten by widget parameters
  - SITE_URL: address (URL) of the website you want to fetch posts from
@@ -24,8 +21,22 @@ var dataDir = "hk01-widget-news-data";
  - SHOW_POST_IMAGES: true = display images next to the post headlines; set to false if you don't want images next to posts
  - Note: combining SHOW_POST_IMAGES = true + small widget will ignore BG_GRADIENT_COLOR values in small config widgets
  */
-var SITE_URL = "http://prod-newsfeed.wezeroplus.com/v2/feed/hot";
-var SITE_NAME = "HKO1 Hot News";
+
+const configs = {
+  "HK01": {
+    SITE_URL: "http://prod-newsfeed.wezeroplus.com/v2/feed/hot",
+    SITE_NAME: "HKO1"
+  },
+  "APPLEDAILY": {
+    SITE_URL: "http://mlprd.api.appledaily.com.hk/arc/1/ArticleList?CC=HK&Platform=ANDROID&D=&Start=0&FromS=&FromCC=HK&Lang=zh_TW&Offset=20&Type=RECOMMENDATION",
+    SITE_NAME: "APPLE DAILY HK"
+  }
+}
+const STORAGE_DIR = "hknews-widget-data"
+
+var SITE_URL = configs.HK01.SITE_URL;
+var SITE_NAME = configs.HK01.SITE_NAME;
+
 var BG_IMAGE_NAME = "none";
 var BG_IMAGE_BLUR = "true";
 var BG_IMAGE_GRADIENT = "true";
@@ -58,16 +69,6 @@ const FONT_COLOR_HEADLINE = Color.dynamic(new Color("#1c1c1e"), new Color("#fefe
 // Unless you know what you're doing.
 // Unlike me, I don't know what I'm doing.
 var WIDGET_SIZE = (config.runsInWidget ? config.widgetFamily : "small");
-if (args.widgetParameter) {
-  let param = args.widgetParameter.split("|");
-  if (param.length >= 1) {WIDGET_SIZE = param[0];}
-  if (param.length >= 2) {SITE_URL = param[1];}
-  if (param.length >= 3) {SITE_NAME = param[2];}
-  if (param.length >= 4) {SHOW_POST_IMAGES = param[3];}
-  if (param.length >= 5) {BG_IMAGE_NAME = param[4];}
-  if (param.length >= 6) {BG_IMAGE_BLUR = param[5];}
-  if (param.length >= 7) {BG_IMAGE_GRADIENT = param[6];}
-}
 
 // set the number of posts depending on WIDGET_SIZE
 var POST_COUNT = 1;
@@ -82,6 +83,8 @@ switch (WIDGET_SIZE) {
     POST_COUNT = 5;
     break;
 }
+
+setWidgetParameters();
 
 // check directories
 await checkFileDirs()
@@ -110,9 +113,7 @@ Script.complete();
 // parameter: none
 // return: an awesome widget
 async function createWidget() {
-  const postData= await getJSONData();
-
-  console.log(postData);
+  const postData = await getJSONData();
   
   const list = new ListWidget();
   
@@ -245,6 +246,26 @@ async function createWidget() {
   return list;
 }
 
+function parseHK01JSONData(item) {
+  return {
+    date: new Date(item.data.lastModifyTime * 1000),
+    title: formatPostTitle(item.data.title),
+    url: "https://www.hk01.com/a/"+item.data.articleId,
+    imgUrl: item.data.mainImage.cdnUrl,
+    id: item.data.articleId
+  }
+}
+
+function parseAppleDailyHKJSONData(item) {
+  return {
+    date: new Date(item.updateDate * 1000),
+    title: formatPostTitle(item.title),
+    url: item.sharing.url,
+    imgUrl: item.sharing.image,
+    id: item._id
+  }
+}
+
 // get all the data for the widget - this is where the magic happens
 // for WordPress sites
 // parameter: nothing at all
@@ -252,29 +273,30 @@ async function createWidget() {
 async function getJSONData() {
   try {
     const loadedJSON = await new Request(SITE_URL).loadJSON();
-    const loadedItems = loadedJSON.items
     const aPostDates = await new Array(5);
     const aPostTitles = await new Array(5);
     const aPostURLs = await new Array(5);
     const aPostIMGURLs = await new Array(5);
     const aPostIMGPaths = await new Array(5);
     const aPostFileNames = await new Array(7);
-    
-    let i;
-    for (i = 0; i < 5; i++) {
 
-      aPostDates[i] = new Date(loadedItems[i].data.lastModifyTime * 1000);
+    for (let i = 0; i < 5; i++) {
+      let itemObj;
+      if (SITE_NAME == configs.HK01.SITE_NAME)
+        itemObj = parseHK01JSONData(loadedJSON.items[i]);
+      if (SITE_NAME == configs.APPLEDAILY.SITE_NAME)
+        itemObj = parseAppleDailyHKJSONData(loadedJSON.content[i])
+  
+      aPostDates[i] = itemObj.date;
+      aPostTitles[i] = itemObj.title;
       
-      aPostTitles[i] = loadedItems[i].data.title;
-      aPostTitles[i] = formatPostTitle(aPostTitles[i]);
-      
-      aPostURLs[i] = "https://www.hk01.com/a/"+loadedItems[i].data.articleId
+      aPostURLs[i] = itemObj.url
       
       if (SHOW_POST_IMAGES == "true") {
-        aPostIMGURLs[i] = loadedItems[i].data.mainImage.cdnUrl;
+        aPostIMGURLs[i] = itemObj.imgUrl;
         if (aPostIMGURLs[i] != "none") {
-          aPostIMGPaths[i] = await getImagePath(loadedItems[i].data.articleId);
-          aPostFileNames[i] = await getFileName(loadedItems[i].data.articleId);
+          aPostIMGPaths[i] = await getImagePath(itemObj.id);
+          aPostFileNames[i] = await getFileName(itemObj.id);
           
           const addBGImage = (i == 0 ? true : false);
           await downloadPostImage(aPostIMGPaths[i], aPostIMGURLs[i], addBGImage);
@@ -292,10 +314,10 @@ async function getJSONData() {
     }
     
     const result = {
-    aPostDates: aPostDates,
-    aPostTitles: aPostTitles,
-    aPostURLs: aPostURLs,
-    aPostIMGPaths: aPostIMGPaths
+      aPostDates: aPostDates,
+      aPostTitles: aPostTitles,
+      aPostURLs: aPostURLs,
+      aPostIMGPaths: aPostIMGPaths
     };
     
     return result;
@@ -362,7 +384,7 @@ function getImagePath(id) {
   const fm = FileManager.local();
   const docDir = fm.documentsDirectory();
   const fileName = getFileName(id);
-  return fm.joinPath(docDir+"/hk01-widget-news-data/image-cache", fileName);
+  return fm.joinPath(docDir+"/"+STORAGE_DIR+"/image-cache", fileName);
 }
 
 // download the post image (if it doesn't already exist)
@@ -455,7 +477,7 @@ async function loadBGImage(imageName, optBlur) {
   const iCloudDocDir = fmiCloud.documentsDirectory();
   const bgIMGiCloudDocPath = fmiCloud.joinPath(iCloudDocDir, imageName);
   const bgIMGiCloudWPPath = fmiCloud.joinPath(iCloudDocDir+"/wallpaper", imageName);
-  const bgIMGWPCachePath = fm.joinPath(docDir+"/hk01-widget-news-data/wallpaper-cache", imageName);
+  const bgIMGWPCachePath = fm.joinPath(docDir+"/"+STORAGE_DIR+"/wallpaper-cache", imageName);
   
   if (optBlur == "true" && fm.fileExists(bgIMGWPCachePath+"-blur")) {
     return await fm.readImage(bgIMGWPCachePath+"-blur");
@@ -497,8 +519,8 @@ function checkFileDirs() {
   // Create new FileManager and set data dir
   const fm = FileManager.local();
   const docDir = fm.documentsDirectory();
-  const cacheDir = docDir+"/hk01-widget-news-data/image-cache";
-  const cacheDirWP = docDir+"/hk01-widget-news-data/wallpaper-cache";
+  const cacheDir = docDir+"/"+STORAGE_DIR+"/image-cache";
+  const cacheDirWP = docDir+"/"+STORAGE_DIR+"/wallpaper-cache";
   
   if (!fm.fileExists(cacheDir)) {fm.createDirectory(cacheDir, true);}
   if (!fm.fileExists(cacheDirWP)) {fm.createDirectory(cacheDirWP, true);}
@@ -512,7 +534,7 @@ function checkFileDirs() {
 function cleanUpImages(aFileNames) {
   const fm = FileManager.local();
   const docDir = fm.documentsDirectory();
-  const cacheDir = docDir+"/hk01-widget-news-data/image-cache";
+  const cacheDir = docDir+"/"+STORAGE_DIR+"/image-cache";
   
   const aFiles = fm.listContents(cacheDir);
   
@@ -946,6 +968,22 @@ async function cropImageToSquare(img) {
     img = draw.getImage();
   }
   return img;
+}
+
+// check and process widget parameters
+function setWidgetParameters() {
+  if (args.widgetParameter) {
+    switch (args.widgetParameter) {
+      case 'HK01':
+          SITE_URL = configs.HK01.SITE_URL;
+          SITE_NAME = configs.HK01.SITE_NAME
+          break;
+      case 'APPLEDAILY':
+          SITE_URL = configs.APPLEDAILY.SITE_URL;
+          SITE_NAME = configs.APPLEDAILY.SITE_NAME
+          break;
+    }
+  }
 }
 
 // end of script
