@@ -21,3 +21,4 @@ Inspired by [Saudumm's project](https://github.com/Saudumm/scriptable-News-Widge
 
 You may repeat step 6-10 to add more HK News Widget. 
 
+![](setup-widget.gif)
