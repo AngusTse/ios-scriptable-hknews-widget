@@ -1,5 +1,7 @@
 # iOS Hong Kong News widget with scriptable
 
+![](setup-result.gif)
+
 ## Requirements
 - iOS 14+
 - [Scriptable for iOS](https://apps.apple.com/de/app/scriptable/id1405459188)
