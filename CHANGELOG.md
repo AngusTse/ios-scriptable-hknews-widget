@@ -1,10 +1,10 @@
 # Changelog
 
-## [0.1.-] - 2021-0
-- replacing Hong Kong Apple Daily to Taiwan due to HK one has been shutdown 
-- clean up codes
+## [0.1.0] - 2021-07-05
+- Replace Hong Kong Apple Daily to Taiwan due to HK Appled Daily has been shutdown 
+- Clean up code
 
 ## [0.0.1] - 2021-02-22
-- supports top TWO Hong Kong news feed
-  - supports HK01 feed
+- Support top TWO Hong Kong news feed
+  - support HK01 feed
   - support Apple Daily HK Feed
