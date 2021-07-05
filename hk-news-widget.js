@@ -2,7 +2,7 @@
 // These must be at the very top of the file. Do not edit.
 // icon-color: blue; icon-glyph: file-alt;
 /* SCRIPTABLE Hong Kong NEWS WIDGET
- v0.0.1 coded by Angus (https://twitter.com/angus_t)
+ v0.1.0 coded by Angus (https://twitter.com/angus_t)
  
  This project used to provide Hong Kong news widget with Scriptable.
  This project inspired from Saudumm (https://github.com/Saudumm/scriptable-News-Widget).  
@@ -28,7 +28,7 @@ const configs = {
     SITE_NAME: "HKO1"
   },
   "APPLEDAILY": {
-    SITE_URL: "http://mlprd.api.appledaily.com.hk/arc/1/ArticleList?CC=HK&Platform=ANDROID&D=&Start=0&FromS=&FromCC=HK&Lang=zh_TW&Offset=20&Type=RECOMMENDATION",
+    SITE_URL: "https://mlprd-api.twnextdigital.com/v1/1/Search?Offset=20&Start=0&Sort=time&KeyWord=%E9%A6%99%E6%B8%AF&lang=zh_TW&ABT=%3D&platform=IPHONE&Build=5395&D=&FromCC=HK&CC=TW&S=&TWAD=1&FromD=&FromS=",
     SITE_NAME: "APPLE DAILY HK"
   }
 }
