@@ -20,7 +20,7 @@
 
 const configs = {
   "HK01": {
-    SITE_URL: "http://prod-newsfeed.wezeroplus.com/v2/feed/hot",
+    SITE_URL: "https://app-data.api.hk01.com/v2/feed/hot",
     SITE_NAME: "HKO1"
   },
   "APPLEDAILY": {
