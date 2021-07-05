@@ -28,8 +28,8 @@ const configs = {
     SITE_NAME: "HKO1"
   },
   "APPLEDAILY": {
-    SITE_URL: "https://mlprd-api.twnextdigital.com/v1/1/Search?Offset=20&Start=0&Sort=time&KeyWord=%E9%A6%99%E6%B8%AF&lang=zh_TW&ABT=%3D&platform=IPHONE&Build=5395&D=&FromCC=HK&CC=TW&S=&TWAD=1&FromD=&FromS=",
-    SITE_NAME: "APPLE DAILY HK"
+    SITE_URL: "https://mlprd-api.twnextdigital.com/v1/1/Search?Offset=10&Start=0&Sort=time&KeyWord=%E9%A6%99%E6%B8%AF&lang=zh_TW&ABT=%3D&platform=IPHONE&Build=5395&D=&FromCC=HK&CC=TW&S=&TWAD=1&FromD=&FromS=",
+    SITE_NAME: "APPLE DAILY TW"
   }
 }
 const STORAGE_DIR = "hknews-widget-data"
