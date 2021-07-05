@@ -19,7 +19,8 @@ Inspired by [Saudumm's project](https://github.com/Saudumm/scriptable-News-Widge
 7. Tap on the + symbol
 8. Search for `Scriptable`
 9. Swipe to choose a widget size and tap `+` Add Widget
-10. Choose `HK News Widget` for Script; `Open App` for When Interacting; `HK01` or `APPLEDAILY` for Parameter. Done
+10. Choose `HK News Widget` for Script; `Open App` for When Interacting; `HK01` or `APPLEDAILY` for feed parameter. Add `,true` afte the feed parameter for showing thumbnail.
+11. Done
 
 You may repeat step 6-10 to add more HK News Widget. 
 
